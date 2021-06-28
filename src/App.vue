@@ -52,8 +52,11 @@
           />
         </div>
         <div class="row mb-2">
+          <button class="btn btn-sm btn-warning col-6" @click="reset">
+            Reset
+          </button>
           <button
-            class="btn btn-sm btn-primary"
+            class="btn btn-sm btn-primary col-6"
             @click="simulate"
             :disabled="totalPercent !== 100 || times === '' || times <= 0"
           >
@@ -122,6 +125,67 @@
                   </td>
                   <td style="text-align: right">
                     {{ rarity.firstObtainedRound.average }}
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-responsive">
+          <h4 class="text-center">Growth Simulator</h4>
+          <table class="table table-bordered w-100" id="data-table">
+            <thead>
+              <tr>
+                <th
+                  style="text-align: center; vertical-align: center"
+                  rowspan="2"
+                >
+                  Rarity
+                </th>
+                <th style="text-align: center" colspan="2">Hash Rate</th>
+                <th style="text-align: center" colspan="2">Growth Range</th>
+                <th style="text-align: center" rowspan="2">Random Hash Rate</th>
+                <th style="text-align: center" rowspan="2">Actions</th>
+              </tr>
+              <tr>
+                <th style="text-align: center">Min</th>
+                <th style="text-align: center">Max</th>
+                <th style="text-align: center">Min</th>
+                <th style="text-align: center">Max</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template
+                v-for="(growthModel, index) in growthModels"
+                :key="index"
+              >
+                <tr>
+                  <td>{{ growthModel.head }}</td>
+                  <td style="text-align: right">
+                    {{ growthModel.minHashRate }}
+                  </td>
+                  <td style="text-align: right">
+                    {{ growthModel.maxHashRate }}
+                  </td>
+                  <td style="text-align: right">
+                    {{ growthModel.growthMin }}
+                  </td>
+                  <td style="text-align: right">
+                    {{ growthModel.growthMax }}
+                  </td>
+                  <td style="text-align: right">
+                    {{ growthModel.randomHashRate }}
+                  </td>
+                  <td class="text-center">
+                    <button
+                      class="btn btn-sm btn-primary mr-2"
+                      @click="randomHashRate(index)"
+                    >
+                      Random Hash Rate
+                    </button>
+                    <button class="btn btn-sm btn-info" @click="growth(index)">
+                      Growth
+                    </button>
                   </td>
                 </tr>
               </template>
@@ -227,6 +291,56 @@ export default {
           },
         },
       ],
+      growthModels: [
+        {
+          head: 'Common',
+          minHashRate: 1,
+          maxHashRate: 3,
+          growthMin: 1,
+          growthMax: 2,
+          randomHashRate: 0,
+        },
+        {
+          head: 'Uncommon',
+          minHashRate: 2,
+          maxHashRate: 5,
+          growthMin: 2,
+          growthMax: 4,
+          randomHashRate: 0,
+        },
+        {
+          head: 'Rare',
+          minHashRate: 6,
+          maxHashRate: 10,
+          growthMin: 6,
+          growthMax: 8,
+          randomHashRate: 0,
+        },
+        {
+          head: 'Epic',
+          minHashRate: 15,
+          maxHashRate: 50,
+          growthMin: 15,
+          growthMax: 40,
+          randomHashRate: 0,
+        },
+        {
+          head: 'Ancient',
+          minHashRate: 100,
+          maxHashRate: 150,
+          growthMin: 80,
+          growthMax: 120,
+          randomHashRate: 0,
+        },
+        {
+          head: 'Mythical',
+          minHashRate: 120,
+          maxHashRate: 180,
+          growthMin: 120,
+          growthMax: 180,
+          randomHashRate: 0,
+        },
+      ],
     };
   },
   computed: {
@@ -258,6 +372,90 @@ export default {
     },
   },
   methods: {
+    reset() {
+      this.times = '';
+      this.simulationCount = 0;
+      this.resultTimes = 0;
+      this.totalTimes = 0;
+      this.commonPercent = 50;
+      this.uncommonPercent = 40;
+      this.rarePercent = 9;
+      this.epicPercent = 1;
+      this.rarityList = [
+        {
+          head: 'Common',
+          times: {
+            current: 0,
+            total: 0,
+          },
+          actualPercent: {
+            current: 0,
+            total: 0,
+          },
+          firstObtainedRound: {
+            current: 0,
+            min: 0,
+            max: 0,
+            average: 0,
+            total: 0,
+          },
+        },
+        {
+          head: 'Uncommon',
+          times: {
+            current: 0,
+            total: 0,
+          },
+          actualPercent: {
+            current: 0,
+            total: 0,
+          },
+          firstObtainedRound: {
+            current: 0,
+            min: 0,
+            max: 0,
+            average: 0,
+            total: 0,
+          },
+        },
+        {
+          head: 'Rare',
+          times: {
+            current: 0,
+            total: 0,
+          },
+          actualPercent: {
+            current: 0,
+            total: 0,
+          },
+          firstObtainedRound: {
+            current: 0,
+            min: 0,
+            max: 0,
+            average: 0,
+            total: 0,
+          },
+        },
+        {
+          head: 'Epic',
+          times: {
+            current: 0,
+            total: 0,
+          },
+          actualPercent: {
+            current: 0,
+            total: 0,
+          },
+          firstObtainedRound: {
+            current: 0,
+            min: 0,
+            max: 0,
+            average: 0,
+            total: 0,
+          },
+        },
+      ];
+    },
     simulate() {
       if (this.totalPercent !== 100) {
         return alert('ใส่ให้ครบ 100% ไอเหี้ย');
@@ -340,14 +538,14 @@ export default {
         ).toFixed(2);
       }
     },
-    getRandomInt(max) {
-      return Math.floor(Math.random() * max) + 1;
+    getRandomInt(min, max) {
+      return Math.floor(Math.random() * max) + min;
     },
     getPercent(number, total) {
       return ((number / total) * 100).toFixed(2);
     },
     getRandomRarityIndex() {
-      let randomizedNumber = this.getRandomInt(10000);
+      let randomizedNumber = this.getRandomInt(1, 10000);
       let commonZone = this.commonPercentNum * 100;
       let uncommonZone = this.uncommonPercentNum * 100 + commonZone;
       let rareZone = this.rarePercentNum * 100 + uncommonZone;
@@ -360,6 +558,22 @@ export default {
       } else {
         return this.rarityIndex.epic;
       }
+    },
+    randomHashRate(index) {
+      let growthModel = this.growthModels[index];
+      let hashRate = this.getRandomInt(
+        growthModel.minHashRate,
+        growthModel.maxHashRate - growthModel.minHashRate + 1
+      );
+      growthModel.randomHashRate = hashRate;
+    },
+    growth(index) {
+      let growthModel = this.growthModels[index];
+      let growth = this.getRandomInt(
+        growthModel.growthMin,
+        growthModel.growthMax - growthModel.growthMin + 1
+      );
+      growthModel.randomHashRate += growth;
     },
   },
 };
