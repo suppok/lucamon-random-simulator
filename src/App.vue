@@ -81,7 +81,7 @@
                 <th style="text-align: center" colspan="2">Times</th>
                 <th style="text-align: center" colspan="2">Percent</th>
                 <th style="text-align: center" colspan="4">
-                  First Obtain Round
+                  First Obtained Round
                 </th>
               </tr>
               <tr>
@@ -111,10 +111,18 @@
                   <td style="text-align: right">
                     {{ rarity.actualPercent.total }}%
                   </td>
-                  <td style="text-align: right">{{ rarity.first }}</td>
-                  <td style="text-align: right">{{ rarity.min }}</td>
-                  <td style="text-align: right">{{ rarity.max }}</td>
-                  <td style="text-align: right">{{ rarity.average }}</td>
+                  <td style="text-align: right">
+                    {{ rarity.firstObtainedRound.current }}
+                  </td>
+                  <td style="text-align: right">
+                    {{ rarity.firstObtainedRound.min }}
+                  </td>
+                  <td style="text-align: right">
+                    {{ rarity.firstObtainedRound.max }}
+                  </td>
+                  <td style="text-align: right">
+                    {{ rarity.firstObtainedRound.average }}
+                  </td>
                 </tr>
               </template>
             </tbody>
@@ -156,11 +164,13 @@ export default {
             current: 0,
             total: 0,
           },
-          first: 0,
-          min: 0,
-          max: 0,
-          average: 0,
-          totalFirstRound: 0,
+          firstObtainedRound: {
+            current: 0,
+            min: 0,
+            max: 0,
+            average: 0,
+            total: 0,
+          },
         },
         {
           head: 'Uncommon',
@@ -172,11 +182,13 @@ export default {
             current: 0,
             total: 0,
           },
-          first: 0,
-          min: 0,
-          max: 0,
-          average: 0,
-          totalFirstRound: 0,
+          firstObtainedRound: {
+            current: 0,
+            min: 0,
+            max: 0,
+            average: 0,
+            total: 0,
+          },
         },
         {
           head: 'Rare',
@@ -188,11 +200,13 @@ export default {
             current: 0,
             total: 0,
           },
-          first: 0,
-          min: 0,
-          max: 0,
-          average: 0,
-          totalFirstRound: 0,
+          firstObtainedRound: {
+            current: 0,
+            min: 0,
+            max: 0,
+            average: 0,
+            total: 0,
+          },
         },
         {
           head: 'Epic',
@@ -204,11 +218,13 @@ export default {
             current: 0,
             total: 0,
           },
-          first: 0,
-          min: 0,
-          max: 0,
-          average: 0,
-          totalFirstRound: 0,
+          firstObtainedRound: {
+            current: 0,
+            min: 0,
+            max: 0,
+            average: 0,
+            total: 0,
+          },
         },
       ],
     };
@@ -280,32 +296,34 @@ export default {
       let uncommon = this.rarityList[this.rarityIndex.uncommon];
       let rare = this.rarityList[this.rarityIndex.rare];
       let epic = this.rarityList[this.rarityIndex.epic];
-      common.first = 0;
+      common.firstObtainedRound.current = 0;
       common.times.current = 0;
-      uncommon.first = 0;
+      uncommon.firstObtainedRound.current = 0;
       uncommon.times.current = 0;
-      rare.first = 0;
+      rare.firstObtainedRound.current = 0;
       rare.times.current = 0;
-      epic.first = 0;
+      epic.firstObtainedRound.current = 0;
       epic.times.current = 0;
       for (let round = 1; round <= this.times; round++) {
         let rarityIndex = this.getRandomRarityIndex();
         let rarityModel = this.rarityList[rarityIndex];
-        if (rarityModel.first === 0) {
-          rarityModel.first = round;
-          if (rarityModel.min === 0) {
-            rarityModel.min = round;
-            rarityModel.max = round;
-          } else if (round < rarityModel.min) {
-            rarityModel.min = round;
-          } else if (round > rarityModel.max) {
-            rarityModel.max = round;
+        if (rarityModel.firstObtainedRound.current === 0) {
+          rarityModel.firstObtainedRound.current = round;
+          rarityModel.firstObtainedRound.total += round;
+          if (rarityModel.firstObtainedRound.min === 0) {
+            rarityModel.firstObtainedRound.min = round;
+            rarityModel.firstObtainedRound.max = round;
+          } else if (round < rarityModel.firstObtainedRound.min) {
+            rarityModel.firstObtainedRound.min = round;
+          } else if (round > rarityModel.firstObtainedRound.max) {
+            rarityModel.firstObtainedRound.max = round;
           }
         }
         rarityModel.times.current++;
       }
       this.resultTimes = parseInt(this.times);
       this.totalTimes += this.resultTimes;
+      this.simulationCount++;
       for (let index = 0; index < this.rarityList.length; index++) {
         let rarityModel = this.rarityList[index];
         rarityModel.actualPercent.current = this.getPercent(
@@ -317,8 +335,10 @@ export default {
           rarityModel.times.total,
           this.totalTimes
         );
+        rarityModel.firstObtainedRound.average = (
+          rarityModel.firstObtainedRound.total / this.simulationCount
+        ).toFixed(2);
       }
-      this.simulationCount++;
     },
     getRandomInt(max) {
       return Math.floor(Math.random() * max) + 1;
