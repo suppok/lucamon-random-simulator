@@ -1,0 +1,354 @@
+<template>
+  <div class="card shadow">
+    <div class="card-header">
+      <div class="offset-4 col-4">
+        <h1 class="text-center">Lucamon Random Simulator</h1>
+        <div class="row mb-2">
+          <label class="col-6" for="commonPercent">Common</label>
+          <input
+            v-model="commonPercent"
+            type="number"
+            id="commonPercent"
+            class="offset-2 col-4 text-end"
+          />
+        </div>
+        <div class="row mb-2">
+          <label class="col-6" for="uncommonPercent">Uncommon</label>
+          <input
+            v-model="uncommonPercent"
+            type="number"
+            id="uncommonPercent"
+            class="offset-2 col-4 text-end"
+          />
+        </div>
+        <div class="row mb-2">
+          <label class="col-6" for="rarePercent">Rare</label>
+          <input
+            v-model="rarePercent"
+            type="number"
+            id="rarePercent"
+            class="offset-2 col-4 text-end"
+          />
+        </div>
+        <div class="row">
+          <label class="col-6" for="epicPercent">Epic</label>
+          <input
+            v-model="epicPercent"
+            type="number"
+            id="epicPercent"
+            class="offset-2 col-4 text-end"
+          />
+        </div>
+        <div class="row mb-4">
+          <span class="offset-6 col-6 text-end">Total {{ totalPercent }}%</span>
+        </div>
+        <div class="row mb-2">
+          <label class="col-6" for="times">Times</label>
+          <input
+            v-model="times"
+            type="number"
+            id="times"
+            class="offset-2 col-4 text-end"
+          />
+        </div>
+        <div class="row mb-2">
+          <button
+            class="btn btn-sm btn-primary"
+            @click="simulate"
+            :disabled="totalPercent !== 100 || times === '' || times <= 0"
+          >
+            Simulate!
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="offset-3 col-6">
+        <h4 class="text-center">
+          Results {{ resultTimes }} times (From
+          {{ simulationCount }} simulations with total {{ totalTimes }} times)
+        </h4>
+        <div class="table-responsive">
+          <table class="table table-bordered w-100" id="data-table">
+            <thead>
+              <tr>
+                <th
+                  style="text-align: center; vertical-align: center"
+                  rowspan="2"
+                >
+                  Rarity
+                </th>
+                <th style="text-align: center" colspan="2">Times</th>
+                <th style="text-align: center" colspan="2">Percent</th>
+                <th style="text-align: center" colspan="4">
+                  First Obtain Round
+                </th>
+              </tr>
+              <tr>
+                <th style="text-align: center">Current</th>
+                <th style="text-align: center">Total</th>
+                <th style="text-align: center">Current</th>
+                <th style="text-align: center">Total</th>
+                <th style="text-align: center">Current</th>
+                <th style="text-align: center">Min</th>
+                <th style="text-align: center">Max</th>
+                <th style="text-align: center">Average</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template v-for="(rarity, index) in rarityList" :key="index">
+                <tr>
+                  <td>{{ rarity.head }}</td>
+                  <td style="text-align: right">
+                    {{ rarity.times.current }}
+                  </td>
+                  <td style="text-align: right">
+                    {{ rarity.times.total }}
+                  </td>
+                  <td style="text-align: right">
+                    {{ rarity.actualPercent.current }}%
+                  </td>
+                  <td style="text-align: right">
+                    {{ rarity.actualPercent.total }}%
+                  </td>
+                  <td style="text-align: right">{{ rarity.first }}</td>
+                  <td style="text-align: right">{{ rarity.min }}</td>
+                  <td style="text-align: right">{{ rarity.max }}</td>
+                  <td style="text-align: right">{{ rarity.average }}</td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'App',
+  data() {
+    return {
+      rarityIndex: {
+        common: 0,
+        uncommon: 1,
+        rare: 2,
+        epic: 3,
+      },
+      times: '',
+      simulationCount: 0,
+      resultTimes: 0,
+      totalTimes: 0,
+      totalPercent: 100,
+      commonPercent: 50,
+      uncommonPercent: 40,
+      rarePercent: 9,
+      epicPercent: 1,
+      rarityList: [
+        {
+          head: 'Common',
+          times: {
+            current: 0,
+            total: 0,
+          },
+          actualPercent: {
+            current: 0,
+            total: 0,
+          },
+          first: 0,
+          min: 0,
+          max: 0,
+          average: 0,
+          totalFirstRound: 0,
+        },
+        {
+          head: 'Uncommon',
+          times: {
+            current: 0,
+            total: 0,
+          },
+          actualPercent: {
+            current: 0,
+            total: 0,
+          },
+          first: 0,
+          min: 0,
+          max: 0,
+          average: 0,
+          totalFirstRound: 0,
+        },
+        {
+          head: 'Rare',
+          times: {
+            current: 0,
+            total: 0,
+          },
+          actualPercent: {
+            current: 0,
+            total: 0,
+          },
+          first: 0,
+          min: 0,
+          max: 0,
+          average: 0,
+          totalFirstRound: 0,
+        },
+        {
+          head: 'Epic',
+          times: {
+            current: 0,
+            total: 0,
+          },
+          actualPercent: {
+            current: 0,
+            total: 0,
+          },
+          first: 0,
+          min: 0,
+          max: 0,
+          average: 0,
+          totalFirstRound: 0,
+        },
+      ],
+    };
+  },
+  computed: {
+    commonPercentNum: function () {
+      return parseFloat(this.commonPercent);
+    },
+    uncommonPercentNum: function () {
+      return parseFloat(this.uncommonPercent);
+    },
+    rarePercentNum: function () {
+      return parseFloat(this.rarePercent);
+    },
+    epicPercentNum: function () {
+      return parseFloat(this.epicPercent);
+    },
+  },
+  watch: {
+    commonPercent() {
+      this.calculateTotalPercent();
+    },
+    uncommonPercent() {
+      this.calculateTotalPercent();
+    },
+    rarePercent() {
+      this.calculateTotalPercent();
+    },
+    epicPercent() {
+      this.calculateTotalPercent();
+    },
+  },
+  methods: {
+    simulate() {
+      if (this.totalPercent !== 100) {
+        return alert('ใส่ให้ครบ 100% ไอเหี้ย');
+      }
+      if (this.times === '' || this.times <= 0) {
+        return alert('ใส่จำนวนครั้งให้ถูกด้วยไอเวร');
+      }
+
+      this.random();
+    },
+    calculateTotalPercent() {
+      let commonPercent = 0;
+      let uncommonPercent = 0;
+      let rarePercent = 0;
+      let epicPercent = 0;
+      if (this.isNumber(this.commonPercent)) {
+        commonPercent = this.commonPercentNum;
+      }
+      if (this.isNumber(this.uncommonPercent)) {
+        uncommonPercent = this.uncommonPercentNum;
+      }
+      if (this.isNumber(this.rarePercent)) {
+        rarePercent = this.rarePercentNum;
+      }
+      if (this.isNumber(this.epicPercent)) {
+        epicPercent = this.epicPercentNum;
+      }
+      this.totalPercent =
+        commonPercent + uncommonPercent + rarePercent + epicPercent;
+    },
+    isNumber(val) {
+      return val !== '' && !isNaN(val);
+    },
+    random() {
+      let common = this.rarityList[this.rarityIndex.common];
+      let uncommon = this.rarityList[this.rarityIndex.uncommon];
+      let rare = this.rarityList[this.rarityIndex.rare];
+      let epic = this.rarityList[this.rarityIndex.epic];
+      common.first = 0;
+      common.times.current = 0;
+      uncommon.first = 0;
+      uncommon.times.current = 0;
+      rare.first = 0;
+      rare.times.current = 0;
+      epic.first = 0;
+      epic.times.current = 0;
+      for (let round = 1; round <= this.times; round++) {
+        let rarityIndex = this.getRandomRarityIndex();
+        let rarityModel = this.rarityList[rarityIndex];
+        if (rarityModel.first === 0) {
+          rarityModel.first = round;
+          if (rarityModel.min === 0) {
+            rarityModel.min = round;
+            rarityModel.max = round;
+          } else if (round < rarityModel.min) {
+            rarityModel.min = round;
+          } else if (round > rarityModel.max) {
+            rarityModel.max = round;
+          }
+        }
+        rarityModel.times.current++;
+      }
+      this.resultTimes = parseInt(this.times);
+      this.totalTimes += this.resultTimes;
+      for (let index = 0; index < this.rarityList.length; index++) {
+        let rarityModel = this.rarityList[index];
+        rarityModel.actualPercent.current = this.getPercent(
+          rarityModel.times.current,
+          this.times
+        );
+        rarityModel.times.total += rarityModel.times.current;
+        rarityModel.actualPercent.total = this.getPercent(
+          rarityModel.times.total,
+          this.totalTimes
+        );
+      }
+      this.simulationCount++;
+    },
+    getRandomInt(max) {
+      return Math.floor(Math.random() * max) + 1;
+    },
+    getPercent(number, total) {
+      return ((number / total) * 100).toFixed(2);
+    },
+    getRandomRarityIndex() {
+      let randomizedNumber = this.getRandomInt(10000);
+      let commonZone = this.commonPercentNum * 100;
+      let uncommonZone = this.uncommonPercentNum * 100 + commonZone;
+      let rareZone = this.rarePercentNum * 100 + uncommonZone;
+      if (randomizedNumber <= commonZone) {
+        return this.rarityIndex.common;
+      } else if (randomizedNumber <= uncommonZone) {
+        return this.rarityIndex.uncommon;
+      } else if (randomizedNumber <= rareZone) {
+        return this.rarityIndex.rare;
+      } else {
+        return this.rarityIndex.epic;
+      }
+    },
+  },
+};
+</script>
+
+<style>
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+</style>
