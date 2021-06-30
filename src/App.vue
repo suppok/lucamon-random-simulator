@@ -1,346 +1,50 @@
 <template>
-  <div class="card shadow">
-    <div class="card-header">
-      <div class="offset-4 col-4">
-        <h1 class="text-center">Lucamon Random Simulator</h1>
-        <div class="row mb-2">
-          <label class="col-6" for="commonPercent">Common</label>
-          <input
-            v-model="commonPercent"
-            type="number"
-            id="commonPercent"
-            class="offset-2 col-4 text-end"
-          />
-        </div>
-        <div class="row mb-2">
-          <label class="col-6" for="uncommonPercent">Uncommon</label>
-          <input
-            v-model="uncommonPercent"
-            type="number"
-            id="uncommonPercent"
-            class="offset-2 col-4 text-end"
-          />
-        </div>
-        <div class="row mb-2">
-          <label class="col-6" for="rarePercent">Rare</label>
-          <input
-            v-model="rarePercent"
-            type="number"
-            id="rarePercent"
-            class="offset-2 col-4 text-end"
-          />
-        </div>
-        <div class="row">
-          <label class="col-6" for="epicPercent">Epic</label>
-          <input
-            v-model="epicPercent"
-            type="number"
-            id="epicPercent"
-            class="offset-2 col-4 text-end"
-          />
-        </div>
-        <div class="row mb-4">
-          <span class="offset-6 col-6 text-end">Total {{ totalPercent }}%</span>
-        </div>
-        <div class="row mb-2">
-          <label class="col-6" for="times">Times</label>
-          <input
-            v-model="times"
-            type="number"
-            id="times"
-            class="offset-2 col-4 text-end"
-          />
-        </div>
-        <div class="row mb-2">
-          <button class="btn btn-sm btn-warning col-6" @click="reset">
-            Reset
-          </button>
-          <button
-            class="btn btn-sm btn-primary col-6"
-            @click="simulate"
-            :disabled="totalPercent !== 100 || times === '' || times <= 0"
-          >
-            Simulate!
-          </button>
-        </div>
+  <div>
+    <div class="row">
+      <div class="btn-group btn-group-toggle" data-toggle="buttons">
+        <label
+          class="btn btn-primary"
+          :class="{ active: type === types.hatching }"
+          @click="type = types.hatching"
+        >
+          Hatching
+        </label>
+        <label
+          class="btn btn-primary"
+          :class="{ active: type === types.breeding }"
+          @click="type = types.breeding"
+        >
+          Breeding
+        </label>
       </div>
     </div>
-    <div class="card-body">
-      <div class="offset-3 col-6">
-        <h4 class="text-center">
-          Results {{ resultTimes }} times (From
-          {{ simulationCount }} simulations with total {{ totalTimes }} times)
-        </h4>
-        <div class="table-responsive">
-          <table class="table table-bordered w-100" id="data-table">
-            <thead>
-              <tr>
-                <th
-                  style="text-align: center; vertical-align: center"
-                  rowspan="2"
-                >
-                  Rarity
-                </th>
-                <th style="text-align: center" colspan="2">Times</th>
-                <th style="text-align: center" colspan="2">Percent</th>
-                <th style="text-align: center" colspan="4">
-                  First Obtained Round
-                </th>
-              </tr>
-              <tr>
-                <th style="text-align: center">Current</th>
-                <th style="text-align: center">Total</th>
-                <th style="text-align: center">Current</th>
-                <th style="text-align: center">Total</th>
-                <th style="text-align: center">Current</th>
-                <th style="text-align: center">Min</th>
-                <th style="text-align: center">Max</th>
-                <th style="text-align: center">Average</th>
-              </tr>
-            </thead>
-            <tbody>
-              <template v-for="(rarity, index) in rarityList" :key="index">
-                <tr>
-                  <td>{{ rarity.head }}</td>
-                  <td style="text-align: right">
-                    {{ rarity.times.current }}
-                  </td>
-                  <td style="text-align: right">
-                    {{ rarity.times.total }}
-                  </td>
-                  <td style="text-align: right">
-                    {{ rarity.actualPercent.current }}%
-                  </td>
-                  <td style="text-align: right">
-                    {{ rarity.actualPercent.total }}%
-                  </td>
-                  <td style="text-align: right">
-                    {{ rarity.firstObtainedRound.current }}
-                  </td>
-                  <td style="text-align: right">
-                    {{ rarity.firstObtainedRound.min }}
-                  </td>
-                  <td style="text-align: right">
-                    {{ rarity.firstObtainedRound.max }}
-                  </td>
-                  <td style="text-align: right">
-                    {{ rarity.firstObtainedRound.average }}
-                  </td>
-                </tr>
-              </template>
-            </tbody>
-          </table>
-        </div>
-        <div class="table-responsive">
-          <h4 class="text-center">Growth Simulator</h4>
-          <table class="table table-bordered w-100" id="data-table">
-            <thead>
-              <tr>
-                <th
-                  style="text-align: center; vertical-align: center"
-                  rowspan="2"
-                >
-                  Rarity
-                </th>
-                <th style="text-align: center" colspan="2">Hash Rate</th>
-                <th style="text-align: center" colspan="2">Growth Range</th>
-                <th style="text-align: center" rowspan="2">Random Hash Rate</th>
-                <th style="text-align: center" rowspan="2">Actions</th>
-              </tr>
-              <tr>
-                <th style="text-align: center">Min</th>
-                <th style="text-align: center">Max</th>
-                <th style="text-align: center">Min</th>
-                <th style="text-align: center">Max</th>
-              </tr>
-            </thead>
-            <tbody>
-              <template
-                v-for="(growthModel, index) in growthModels"
-                :key="index"
-              >
-                <tr>
-                  <td>{{ growthModel.head }}</td>
-                  <td style="text-align: right">
-                    {{ growthModel.minHashRate }}
-                  </td>
-                  <td style="text-align: right">
-                    {{ growthModel.maxHashRate }}
-                  </td>
-                  <td style="text-align: right">
-                    {{ growthModel.growthMin }}
-                  </td>
-                  <td style="text-align: right">
-                    {{ growthModel.growthMax }}
-                  </td>
-                  <td style="text-align: right">
-                    {{ growthModel.randomHashRate }}
-                  </td>
-                  <td class="text-center">
-                    <button
-                      class="btn btn-sm btn-primary mr-2"
-                      @click="randomHashRate(index)"
-                    >
-                      Random Hash Rate
-                    </button>
-                    <button class="btn btn-sm btn-info" @click="growth(index)">
-                      Growth
-                    </button>
-                  </td>
-                </tr>
-              </template>
-            </tbody>
-          </table>
-        </div>
+    <div class="card shadow">
+      <div v-if="type === types.hatching">
+        <Hatching />
+      </div>
+      <div v-if="type === types.breeding">
+        <Breeding />
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import Hatching from './components/Hatching';
+import Breeding from './components/Breeding';
 export default {
   name: 'App',
+  components: {
+    Hatching,
+    Breeding,
+  },
   data() {
     return {
-      rarityIndex: {
-        common: 0,
-        uncommon: 1,
-        rare: 2,
-        epic: 3,
+      types: {
+        hatching: 1,
+        breeding: 2,
       },
-      times: '',
-      simulationCount: 0,
-      resultTimes: 0,
-      totalTimes: 0,
-      totalPercent: 100,
-      commonPercent: 50,
-      uncommonPercent: 40,
-      rarePercent: 9,
-      epicPercent: 1,
-      rarityList: [
-        {
-          head: 'Common',
-          times: {
-            current: 0,
-            total: 0,
-          },
-          actualPercent: {
-            current: 0,
-            total: 0,
-          },
-          firstObtainedRound: {
-            current: 0,
-            min: 0,
-            max: 0,
-            average: 0,
-            total: 0,
-          },
-        },
-        {
-          head: 'Uncommon',
-          times: {
-            current: 0,
-            total: 0,
-          },
-          actualPercent: {
-            current: 0,
-            total: 0,
-          },
-          firstObtainedRound: {
-            current: 0,
-            min: 0,
-            max: 0,
-            average: 0,
-            total: 0,
-          },
-        },
-        {
-          head: 'Rare',
-          times: {
-            current: 0,
-            total: 0,
-          },
-          actualPercent: {
-            current: 0,
-            total: 0,
-          },
-          firstObtainedRound: {
-            current: 0,
-            min: 0,
-            max: 0,
-            average: 0,
-            total: 0,
-          },
-        },
-        {
-          head: 'Epic',
-          times: {
-            current: 0,
-            total: 0,
-          },
-          actualPercent: {
-            current: 0,
-            total: 0,
-          },
-          firstObtainedRound: {
-            current: 0,
-            min: 0,
-            max: 0,
-            average: 0,
-            total: 0,
-          },
-        },
-      ],
-      growthModels: [
-        {
-          head: 'Common',
-          minHashRate: 1,
-          maxHashRate: 3,
-          growthMin: 1,
-          growthMax: 2,
-          randomHashRate: 0,
-        },
-        {
-          head: 'Uncommon',
-          minHashRate: 2,
-          maxHashRate: 5,
-          growthMin: 2,
-          growthMax: 4,
-          randomHashRate: 0,
-        },
-        {
-          head: 'Rare',
-          minHashRate: 6,
-          maxHashRate: 10,
-          growthMin: 6,
-          growthMax: 8,
-          randomHashRate: 0,
-        },
-        {
-          head: 'Epic',
-          minHashRate: 15,
-          maxHashRate: 50,
-          growthMin: 15,
-          growthMax: 40,
-          randomHashRate: 0,
-        },
-        {
-          head: 'Ancient',
-          minHashRate: 100,
-          maxHashRate: 150,
-          growthMin: 80,
-          growthMax: 120,
-          randomHashRate: 0,
-        },
-        {
-          head: 'Mythical',
-          minHashRate: 120,
-          maxHashRate: 180,
-          growthMin: 120,
-          growthMax: 180,
-          randomHashRate: 0,
-        },
-      ],
+      type: 1,
     };
   },
   computed: {
@@ -584,5 +288,8 @@ input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
+}
+body::-webkit-scrollbar {
+  display: none;
 }
 </style>
