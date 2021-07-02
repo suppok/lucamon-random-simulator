@@ -45,7 +45,12 @@
           <button
             class="btn btn-sm btn-primary col-6"
             @click="breed"
-            :disabled="firstRarityIndex === '' || secondRarityIndex === ''"
+            :disabled="
+              firstRarityIndex === '' ||
+              secondRarityIndex === '' ||
+              times === '' ||
+              times <= 0
+            "
           >
             Simulate!
           </button>
@@ -96,7 +101,9 @@
                   <td style="text-align: right">
                     {{ rarity.times.total }}
                   </td>
-                  <td style="text-align: right">{{ percentResult[index] }}%</td>
+                  <td style="text-align: right">
+                    <b>{{ percentResult[index] }}%</b>
+                  </td>
                   <td style="text-align: right">
                     {{ rarity.actualPercent.current }}%
                   </td>
