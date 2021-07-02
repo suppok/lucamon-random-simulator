@@ -278,6 +278,125 @@ export default {
     };
   },
   methods: {
+    reset() {
+      this.times = '';
+      this.simulationCount = 0;
+      this.resultTimes = 0;
+      this.totalTimes = 0;
+      this.rarities = [
+        {
+          name: 'Common',
+          times: {
+            current: 0,
+            total: 0,
+          },
+          actualPercent: {
+            current: 0,
+            total: 0,
+          },
+          firstObtainedRound: {
+            current: 0,
+            min: 0,
+            max: 0,
+            average: 0,
+            total: 0,
+          },
+        },
+        {
+          name: 'Uncommon',
+          times: {
+            current: 0,
+            total: 0,
+          },
+          actualPercent: {
+            current: 0,
+            total: 0,
+          },
+          firstObtainedRound: {
+            current: 0,
+            min: 0,
+            max: 0,
+            average: 0,
+            total: 0,
+          },
+        },
+        {
+          name: 'Rare',
+          times: {
+            current: 0,
+            total: 0,
+          },
+          actualPercent: {
+            current: 0,
+            total: 0,
+          },
+          firstObtainedRound: {
+            current: 0,
+            min: 0,
+            max: 0,
+            average: 0,
+            total: 0,
+          },
+        },
+        {
+          name: 'Epic',
+          times: {
+            current: 0,
+            total: 0,
+          },
+          actualPercent: {
+            current: 0,
+            total: 0,
+          },
+          firstObtainedRound: {
+            current: 0,
+            min: 0,
+            max: 0,
+            average: 0,
+            total: 0,
+          },
+        },
+        {
+          name: 'Ancient',
+          times: {
+            current: 0,
+            total: 0,
+          },
+          actualPercent: {
+            current: 0,
+            total: 0,
+          },
+          firstObtainedRound: {
+            current: 0,
+            min: 0,
+            max: 0,
+            average: 0,
+            total: 0,
+          },
+        },
+        {
+          name: 'Mythical',
+          times: {
+            current: 0,
+            total: 0,
+          },
+          actualPercent: {
+            current: 0,
+            total: 0,
+          },
+          firstObtainedRound: {
+            current: 0,
+            min: 0,
+            max: 0,
+            average: 0,
+            total: 0,
+          },
+        },
+      ];
+      this.firstRarityIndex = '';
+      this.secondRarityIndex = '';
+      this.percentResult = [0, 0, 0, 0, 0, 0];
+    },
     breed() {
       if (this.firstRarityIndex === '' || this.secondRarityIndex === '') {
         return alert('เลือก rarity ดิวะ');
