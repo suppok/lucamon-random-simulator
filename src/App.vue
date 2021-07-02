@@ -16,6 +16,13 @@
         >
           Breeding
         </label>
+        <label
+            class="btn btn-primary"
+            :class="{ active: type === types.growth }"
+            @click="type = types.growth"
+        >
+          Growth
+        </label>
       </div>
     </div>
     <div class="card shadow">
@@ -25,6 +32,9 @@
       <div v-if="type === types.breeding">
         <Breeding />
       </div>
+      <div v-if="type === types.growth">
+        <Growth />
+      </div>
     </div>
   </div>
 </template>
@@ -32,17 +42,20 @@
 <script>
 import Hatching from './components/Hatching';
 import Breeding from './components/Breeding';
+import Growth from './components/Growth';
 export default {
   name: 'App',
   components: {
     Hatching,
     Breeding,
+    Growth,
   },
   data() {
     return {
       types: {
         hatching: 1,
         breeding: 2,
+        growth: 3,
       },
       type: 2,
     };
