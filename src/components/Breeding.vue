@@ -286,6 +286,7 @@ export default {
       this.rarities = [
         {
           name: 'Common',
+          weight: 32,
           times: {
             current: 0,
             total: 0,
@@ -304,6 +305,7 @@ export default {
         },
         {
           name: 'Uncommon',
+          weight: 16,
           times: {
             current: 0,
             total: 0,
@@ -322,6 +324,7 @@ export default {
         },
         {
           name: 'Rare',
+          weight: 8,
           times: {
             current: 0,
             total: 0,
@@ -340,6 +343,7 @@ export default {
         },
         {
           name: 'Epic',
+          weight: 4,
           times: {
             current: 0,
             total: 0,
@@ -358,6 +362,7 @@ export default {
         },
         {
           name: 'Ancient',
+          weight: 2,
           times: {
             current: 0,
             total: 0,
@@ -376,6 +381,7 @@ export default {
         },
         {
           name: 'Mythical',
+          weight: 1,
           times: {
             current: 0,
             total: 0,
