@@ -17,11 +17,18 @@
           Breeding
         </label>
         <label
-            class="btn btn-primary"
-            :class="{ active: type === types.growth }"
-            @click="type = types.growth"
+          class="btn btn-primary"
+          :class="{ active: type === types.growth }"
+          @click="type = types.growth"
         >
           Growth
+        </label>
+        <label
+          class="btn btn-primary"
+          :class="{ active: type === types.time }"
+          @click="type = types.time"
+        >
+          Time
         </label>
       </div>
     </div>
@@ -35,6 +42,9 @@
       <div v-if="type === types.growth">
         <Growth />
       </div>
+      <div v-if="type === types.time">
+        <Time />
+      </div>
     </div>
   </div>
 </template>
@@ -43,12 +53,14 @@
 import Hatching from './components/Hatching';
 import Breeding from './components/Breeding';
 import Growth from './components/Growth';
+import Time from './components/Time';
 export default {
   name: 'App',
   components: {
     Hatching,
     Breeding,
     Growth,
+    Time,
   },
   data() {
     return {
@@ -56,8 +68,9 @@ export default {
         hatching: 1,
         breeding: 2,
         growth: 3,
+        time: 4,
       },
-      type: 2,
+      type: 4,
     };
   },
 };
