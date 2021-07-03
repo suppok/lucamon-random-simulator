@@ -108,7 +108,13 @@
     </div>
     <div class="card-body">
       <div class="offset-4 col-4 text-center">
-        <h1>Result {{ totalTime }} hours with {{ totalCost }} Baht</h1>
+        <h1>
+          Result {{ totalTime }} hours with {{ totalCost }} Baht &
+          {{ availableLucamons.length }} Lucamons
+        </h1>
+        <template v-for="(item, index) in availableLucamons" :key="index">
+          {{ item.rarity }}
+        </template>
       </div>
     </div>
   </div>
@@ -370,6 +376,7 @@ export default {
         breedingLeft: 6,
       };
       this.availableLucamons.push(newLucamon);
+      this.availableLucamons.sort(this.compare);
     },
     addNewLucamonFromBreeding() {
       let newLucamon = {
@@ -377,6 +384,7 @@ export default {
         breedingLeft: 6,
       };
       this.availableLucamons.push(newLucamon);
+      this.availableLucamons.sort(this.compare);
       if (newLucamon.rarity === this.rarityIndex.mythical) {
         this.hasMythical = true;
       }
@@ -405,6 +413,15 @@ export default {
     },
     getPercent(number, total) {
       return ((number / total) * 100).toFixed(2);
+    },
+    compare(a, b) {
+      if (a.rarity < b.rarity) {
+        return -1;
+      }
+      if (a.rarity > b.rarity) {
+        return 1;
+      }
+      return 0;
     },
   },
 };
