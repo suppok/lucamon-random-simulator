@@ -108,11 +108,15 @@
     </div>
     <div class="card-body">
       <div class="offset-4 col-4 text-center">
-        <h1>
+        <h4>
           Result {{ totalTime }} hours with {{ totalCost }} Baht &
-          {{ availableLucamons.length }} Lucamons
-        </h1>
+          {{ allLucamons.length }} Lucamons
+        </h4>
         <template v-for="(item, index) in availableLucamons" :key="index">
+          {{ item.rarity }}
+        </template>
+        <br />
+        <template v-for="(item, index) in allLucamons" :key="index">
           {{ item.rarity }}
         </template>
       </div>
@@ -125,22 +129,28 @@ export default {
   name: 'Time',
   data() {
     return {
+      hasMythical: false,
       eggPrice: 1000,
       totalTime: 0,
       totalCost: 0,
+
+      hatchingTimeFromBreeding: 0,
+      breedingTime: 2,
+      breedingLimit: 6,
+
       totalPercent: 100,
       commonPercent: 50,
       uncommonPercent: 40,
       rarePercent: 9,
       epicPercent: 1,
-      hasMythical: false,
-      breedingTime: 2,
+
       commonHatchingTime: 12,
       uncommonHatchingTime: 24,
       rareHatchingTime: 36,
       epicHatchingTime: 48,
       ancientHatchingTime: 60,
       mythicalHatchingTime: 120,
+
       rarityIndex: {
         common: 0,
         uncommon: 1,
@@ -149,17 +159,19 @@ export default {
         ancient: 4,
         mythical: 5,
       },
-      newLucamonFromBreeding: {
-        rarity: 0,
-        remainingTime: 0,
-      },
+      hatchingRarity: 0,
+      breedingRarity: 0,
       hatchingCountdown: 0,
       breedingCountdown: 0,
+
       availableLucamons: [],
-      hasEgg: false,
-      hatchingRarity: 0,
+      availableEggs: [],
+      allEggs: [],
+      allLucamons: [],
+
       isBreeding: false,
       isHatching: false,
+
       rarities: [
         {
           name: 'Common',
@@ -259,20 +271,28 @@ export default {
           this.addNewLucamonFromHatching();
           this.isHatching = false;
         }
-        if (this.breedingCountdown === 0 && this.isBreeding) {
-          this.addNewLucamonFromBreeding();
-          this.isBreeding = false;
-        }
         if (this.hasMythical) {
           break;
         }
+        if (this.breedingCountdown === 0 && this.isBreeding) {
+          this.addNewEggFromBreeding();
+          this.isBreeding = false;
+        }
         if (this.availableLucamons.length >= 2) {
-          if (!this.isBreeding) {
+          if (!this.isBreeding && !this.isHatching) {
+            lucamons.sort(this.compare);
             this.breed(lucamons.length - 1, lucamons.length - 2);
           }
+          if (this.availableEggs.length > 0) {
+            if (!this.isHatching) {
+              this.hatch();
+            }
+          }
         } else {
-          if (!this.hasEgg) {
-            this.buyEgg();
+          if (this.availableEggs.length === 0) {
+            if (!this.isBreeding) {
+              this.buyEgg();
+            }
           }
           if (!this.isHatching) {
             this.hatch();
@@ -305,18 +325,28 @@ export default {
     },
     buyEgg() {
       this.totalCost += this.eggPrice;
-      this.hasEgg = true;
+      let rarityIndex = this.getRandomRarityIndex();
+      let newEgg = {
+        rarity: rarityIndex,
+        hatchingTime: this.getHatchingTime(rarityIndex),
+      };
+      this.availableEggs.push(newEgg);
+      this.availableEggs.sort(this.compare);
+      this.allEggs.push(newEgg);
     },
     randomlyBreed() {
-      this.newLucamonFromBreeding.rarity = this.getRandomBreedingRarityIndex();
+      this.breedingRarity = this.getRandomBreedingRarityIndex();
+      this.hatchingTimeFromBreeding = this.getHatchingTime(this.breedingRarity);
       this.breedingCountdown = this.breedingTime;
     },
     hatch() {
-      let rarityIndex = this.getRandomRarityIndex();
-      this.hatchingRarity = rarityIndex;
-      this.hatchingCountdown = this.getHatchingTime(rarityIndex);
+      let eggs = this.availableEggs;
+      eggs.sort(this.compare);
+      let hatchedEgg = eggs[eggs.length - 1];
+      this.hatchingRarity = hatchedEgg.rarity;
+      this.hatchingCountdown = hatchedEgg.hatchingTime;
       this.isHatching = true;
-      this.hasEgg = false;
+      eggs.splice(eggs.length - 1, 1);
     },
     getRandomRarityIndex() {
       let randomizedNumber = this.getRandomInt(1, 10000);
@@ -373,23 +403,26 @@ export default {
     addNewLucamonFromHatching() {
       let newLucamon = {
         rarity: this.hatchingRarity,
-        breedingLeft: 6,
+        breedingLeft: this.breedingLimit,
       };
       this.availableLucamons.push(newLucamon);
       this.availableLucamons.sort(this.compare);
-    },
-    addNewLucamonFromBreeding() {
-      let newLucamon = {
-        rarity: this.newLucamonFromBreeding.rarity,
-        breedingLeft: 6,
-      };
-      this.availableLucamons.push(newLucamon);
-      this.availableLucamons.sort(this.compare);
+      this.allLucamons.push(newLucamon);
       if (newLucamon.rarity === this.rarityIndex.mythical) {
         this.hasMythical = true;
       }
     },
+    addNewEggFromBreeding() {
+      let newEgg = {
+        rarity: this.breedingRarity,
+        hatchingTime: this.hatchingTimeFromBreeding,
+      };
+      this.availableEggs.push(newEgg);
+      this.availableEggs.sort(this.compare);
+      this.allEggs.push(newEgg);
+    },
     calculateBreedingPercent(lucamon1, lucamon2) {
+      this.percentResult = [0, 0, 0, 0, 0, 0];
       let firstTotalWeight = this.rarities[lucamon1.rarity].weight;
       let secondTotalWeight = this.rarities[lucamon2.rarity].weight;
       let totalWeight = 0;
