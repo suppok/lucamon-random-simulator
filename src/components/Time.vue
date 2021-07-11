@@ -93,7 +93,7 @@
           <span class="offset-6 col-6 text-end">Total {{ totalPercent }}%</span>
         </div>
         <div class="row mb-2">
-          <label class="col-4">Price</label>
+          <label class="col-4">Egg Price</label>
           <input
             v-model="eggPrice"
             type="number"
@@ -124,10 +124,26 @@
             class="offset-5 col-3 text-end"
           />
         </div>
-        <div class="row mb-5">
+        <div class="row mb-2">
           <label class="col-4">Breeding Chance Max</label>
           <input
             v-model="breedingChanceMax"
+            type="number"
+            class="offset-5 col-3 text-end"
+          />
+        </div>
+        <div class="row mb-2">
+          <label class="col-4">Breeding Fee</label>
+          <input
+            v-model="breeding.fee"
+            type="number"
+            class="offset-5 col-3 text-end"
+          />
+        </div>
+        <div class="row mb-5">
+          <label class="col-4">Hatching Fee</label>
+          <input
+            v-model="hatching.fee"
             type="number"
             class="offset-5 col-3 text-end"
           />
@@ -148,10 +164,24 @@
     </div>
     <div class="card-body">
       <div class="offset-3 col-6">
-        <h4 class="text-center">
-          {{ availableEggs.length }}
-          Result {{ totalTime }} hours with {{ totalCost }} Baht &
-          {{ allLucamons.length }} Lucamons
+        <h4>
+          Result <br />
+          Time: {{ totalTime }} hours<br />
+          - {{ totalTime / 24 }} days<br />
+          Costs: {{ totalCost }} Baht<br />
+          - Breeding Fee: {{ totalBreed * breedingFeeNum }} Baht ({{
+            totalBreed
+          }}
+          times)<br />
+          - Hatching Fee: {{ totalHatch * hatchingFeeNum }} Baht ({{
+            totalHatch
+          }}
+          times)<br />
+          - Buying Fee: {{ totalEggBuying * eggPrice }} Baht ({{
+            totalEggBuying
+          }}
+          times)<br />
+          Lucamons: {{ allLucamons.length }}
         </h4>
         <div class="table-responsive">
           <table class="table table-bordered w-100" id="data-table">
@@ -192,22 +222,29 @@ export default {
         rarity: 0,
         isBreeding: false,
         chance: 0,
+        fee: 45,
       },
       hatching: {
         rarity: 0,
         countdown: 0,
         isHatching: false,
+        fee: 15,
       },
+
+      breedingFees: [15, 30, 45, 90, 180],
 
       hasMythical: false,
       eggPrice: 600,
       totalTime: 0,
       totalCost: 0,
+      totalBreed: 0,
+      totalHatch: 0,
+      totalEggBuying: 0,
 
-      breedingTime: 2,
-      breedingLimit: 6,
-      breedingChanceMin: 45,
-      breedingChanceMax: 45,
+      breedingTime: 4,
+      breedingLimit: 5,
+      breedingChanceMin: 60,
+      breedingChanceMax: 80,
 
       totalPercent: 100,
       commonPercent: 50,
@@ -217,12 +254,12 @@ export default {
       ancientPercent: '',
       mythicalPercent: '',
 
-      commonHatchingTime: 12,
-      uncommonHatchingTime: 24,
-      rareHatchingTime: 36,
-      epicHatchingTime: 48,
-      ancientHatchingTime: 60,
-      mythicalHatchingTime: 120,
+      commonHatchingTime: 10,
+      uncommonHatchingTime: 20,
+      rareHatchingTime: 30,
+      epicHatchingTime: 40,
+      ancientHatchingTime: 50,
+      mythicalHatchingTime: 100,
 
       rarityIndex: {
         common: 0,
@@ -266,11 +303,11 @@ export default {
         },
       ],
       weightList: [
-        [80, 20, 0, 0, 0, 0],
-        [30, 50, 20, 0, 0, 0],
+        [60, 35, 5, 0, 0, 0],
+        [30, 40, 25, 5, 0, 0],
         [20, 30, 30, 20, 0, 0],
-        [15, 20, 35, 20, 10, 0],
-        [10, 20, 30, 25, 10, 5],
+        [15, 20, 30, 20, 15, 0],
+        [10, 20, 25, 20, 15, 10],
       ],
     };
   },
@@ -292,6 +329,12 @@ export default {
     },
     breedingChanceMaxNum: function () {
       return parseInt(this.breedingChanceMax);
+    },
+    breedingFeeNum: function () {
+      return parseInt(this.breeding.fee);
+    },
+    hatchingFeeNum: function () {
+      return parseInt(this.hatching.fee);
     },
     isMythicalAvailable: function () {
       return this.availableLucamons.find(
@@ -320,37 +363,25 @@ export default {
         rarity: 0,
         isBreeding: false,
         chance: 0,
+        fee: 45,
       };
       this.hatching = {
         rarity: 0,
         countdown: 0,
         isHatching: false,
+        fee: 15,
       };
 
       this.hasMythical = false;
-      this.eggPrice = 600;
       this.totalTime = 0;
       this.totalCost = 0;
-
-      this.breedingTime = 2;
-      this.breedingLimit = 6;
-      this.breedingChanceMin = 45;
-      this.breedingChanceMax = 45;
+      this.totalBreed = 0;
+      this.totalHatch = 0;
+      this.totalEggBuying = 0;
 
       this.totalPercent = 100;
-      this.commonPercent = 50;
-      this.uncommonPercent = 40;
-      this.rarePercent = 9;
-      this.epicPercent = 1;
       this.ancientPercent = '';
       this.mythicalPercent = '';
-
-      this.commonHatchingTime = 12;
-      this.uncommonHatchingTime = 24;
-      this.rareHatchingTime = 36;
-      this.epicHatchingTime = 48;
-      this.ancientHatchingTime = 60;
-      this.mythicalHatchingTime = 120;
 
       this.rarityIndex = {
         common: 0,
@@ -396,10 +427,6 @@ export default {
       }
 
       while (!this.isMythicalAvailable) {
-        if (this.totalCost > 1000000) {
-          alert('มึงใช้เงินไปเกิน 2 ล้านละไอเหี้ยยย');
-          break;
-        }
         if (this.hatching.countdown === 0 && this.hatching.isHatching) {
           this.addNewLucamonFromHatching();
           this.hatching.isHatching = false;
@@ -450,6 +477,7 @@ export default {
       );
     },
     breedingStep() {
+      this.totalBreed++;
       let lucamons = this.availableLucamons;
       lucamons.sort(this.compare);
       let lucamonIndex1 = lucamons.length - 1;
@@ -458,6 +486,9 @@ export default {
       this.breeding.rarity = this.breed(lucamonIndex1, lucamonIndex2);
       let lucamon1 = lucamons[lucamonIndex1];
       let lucamon2 = lucamons[lucamonIndex2];
+      let lucamon1Price = this.breedingFees[5 - lucamon1.breedingLeft];
+      let lucamon2Price = this.breedingFees[5 - lucamon2.breedingLeft];
+      this.totalCost += (lucamon1Price + lucamon2Price) / 2;
 
       lucamon1.breedingLeft--;
       lucamon2.breedingLeft--;
@@ -514,6 +545,7 @@ export default {
       return this.availableLucamons[lucamonIndex].breedingLeft;
     },
     buyEgg() {
+      this.totalEggBuying++;
       this.totalCost += this.eggPrice;
       let rarityIndex = this.getRandomRarityIndex();
       let newEgg = {
@@ -523,12 +555,15 @@ export default {
       this.availableEggs.push(newEgg);
       this.availableEggs.sort(this.compare);
       this.allEggs.push(newEgg);
+      this.addBuyingLog();
     },
     randomlyBreed(percentResult) {
       return this.getRandomBreedingRarityIndex(percentResult);
     },
     //User don't know egg rarity, therefore this logic will be the best egg first
     hatchingStep() {
+      this.totalHatch++;
+      this.totalCost += this.hatchingFeeNum;
       let eggs = this.availableEggs;
       eggs.sort(this.compare);
       let hatchedEgg = eggs[eggs.length - 1];
@@ -670,6 +705,14 @@ export default {
         num: num,
         action: 'Hatching',
         detail: rarity,
+      });
+    },
+    addBuyingLog() {
+      let num = this.logs.length + 1;
+      this.logs.push({
+        num: num,
+        action: 'Buying',
+        detail: '',
       });
     },
     isBreedSuccessfully() {
