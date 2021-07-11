@@ -31,7 +31,7 @@
         </div>
         <div class="row mb-2">
           <label class="col-6" for="times">Times</label>
-          <input
+          <input 
             v-model="times"
             type="number"
             id="times"

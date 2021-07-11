@@ -89,8 +89,48 @@
           />
         </div>
 
-        <div class="row mb-5">
+        <div class="row mb-2">
           <span class="offset-6 col-6 text-end">Total {{ totalPercent }}%</span>
+        </div>
+        <div class="row mb-2">
+          <label class="col-4">Price</label>
+          <input
+            v-model="eggPrice"
+            type="number"
+            class="offset-5 col-3 text-end"
+          />
+        </div>
+        <div class="row mb-2">
+          <label class="col-4">Breeding Time</label>
+          <input
+            v-model="breedingTime"
+            type="number"
+            class="offset-5 col-3 text-end"
+          />
+        </div>
+        <div class="row mb-2">
+          <label class="col-4">Breeding Limit</label>
+          <input
+            v-model="breedingLimit"
+            type="number"
+            class="offset-5 col-3 text-end"
+          />
+        </div>
+        <div class="row mb-2">
+          <label class="col-4">Breeding Chance Min</label>
+          <input
+            v-model="breedingChanceMin"
+            type="number"
+            class="offset-5 col-3 text-end"
+          />
+        </div>
+        <div class="row mb-5">
+          <label class="col-4">Breeding Chance Max</label>
+          <input
+            v-model="breedingChanceMax"
+            type="number"
+            class="offset-5 col-3 text-end"
+          />
         </div>
         <div class="row mb-2">
           <button class="btn btn-sm btn-warning col-6" @click="reset">
@@ -247,6 +287,12 @@ export default {
     epicPercentNum: function () {
       return parseFloat(this.epicPercent);
     },
+    breedingChanceMinNum: function () {
+      return parseInt(this.breedingChanceMin);
+    },
+    breedingChanceMaxNum: function () {
+      return parseInt(this.breedingChanceMax);
+    },
     isMythicalAvailable: function () {
       return this.availableLucamons.find(
         (item) => item.rarity === this.rarityIndex.mythical
@@ -268,6 +314,59 @@ export default {
     },
   },
   methods: {
+    reset() {
+      this.breeding = {
+        countdown: 0,
+        rarity: 0,
+        isBreeding: false,
+        chance: 0,
+      };
+      this.hatching = {
+        rarity: 0,
+        countdown: 0,
+        isHatching: false,
+      };
+
+      this.hasMythical = false;
+      this.eggPrice = 600;
+      this.totalTime = 0;
+      this.totalCost = 0;
+
+      this.breedingTime = 2;
+      this.breedingLimit = 6;
+      this.breedingChanceMin = 45;
+      this.breedingChanceMax = 45;
+
+      this.totalPercent = 100;
+      this.commonPercent = 50;
+      this.uncommonPercent = 40;
+      this.rarePercent = 9;
+      this.epicPercent = 1;
+      this.ancientPercent = '';
+      this.mythicalPercent = '';
+
+      this.commonHatchingTime = 12;
+      this.uncommonHatchingTime = 24;
+      this.rareHatchingTime = 36;
+      this.epicHatchingTime = 48;
+      this.ancientHatchingTime = 60;
+      this.mythicalHatchingTime = 120;
+
+      this.rarityIndex = {
+        common: 0,
+        uncommon: 1,
+        rare: 2,
+        epic: 3,
+        ancient: 4,
+        mythical: 5,
+      };
+
+      this.availableLucamons = [];
+      this.availableEggs = [];
+      this.allEggs = [];
+      this.allLucamons = [];
+      this.logs = [];
+    },
     calculateTotalPercent() {
       let commonPercent = 0;
       let uncommonPercent = 0;
@@ -496,8 +595,8 @@ export default {
         rarity: this.hatching.rarity,
         breedingLeft: this.breedingLimit,
         breedingChance: this.getRandomInt(
-          this.breedingChanceMin,
-          this.breedingChanceMax - this.breedingChanceMin
+          this.breedingChanceMinNum,
+          this.breedingChanceMaxNum - this.breedingChanceMinNum
         ),
       };
       this.availableLucamons.push(newLucamon);
